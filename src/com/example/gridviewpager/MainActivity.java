@@ -1,7 +1,9 @@
-package com.example.viewpagergridview;
+package com.example.gridviewpager;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import com.example.viewpagergridview.R;
 
 import android.app.Activity;
 import android.content.res.Configuration;

@@ -1,4 +1,4 @@
-package com.example.viewpagergridview;
+package com.example.gridviewpager;
 
 import android.content.Context;
 import android.support.v4.view.ViewPager;

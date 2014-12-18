@@ -15,6 +15,9 @@ public class WrapContentViewPager extends ViewPager {
         super(context, attrs);
     }
 
+    /**
+     * Let ViewPager can warpContent
+     */
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         int height = 0;
@@ -22,7 +25,7 @@ public class WrapContentViewPager extends ViewPager {
         for (int i = 0; i < getChildCount(); i++) {
             View child = getChildAt(i);
             child.measure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
-            
+
             int h = child.getMeasuredHeight();
             if (h > height) {
                 height = h;

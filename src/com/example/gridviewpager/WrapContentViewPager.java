@@ -7,6 +7,11 @@ import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.view.View;
 
+/**
+ * Custom ViewPager for warpContent
+ * @author Ken Huang
+ *
+ */
 public class WrapContentViewPager extends ViewPager implements OnSizeChangeListener {
 
     private int verticalNum = 2; // initial value
@@ -42,6 +47,9 @@ public class WrapContentViewPager extends ViewPager implements OnSizeChangeListe
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }
 
+    /**
+     * update gridView size change
+     */
     @Override
     public void onSizeChange(int verticalNum) {
         this.verticalNum = verticalNum;

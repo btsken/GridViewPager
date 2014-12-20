@@ -7,30 +7,38 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.support.v4.view.ViewPager.OnPageChangeListener;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.gridviewpager.GridViewPagerAdapter.OnGridItemClickListener;
 import com.example.viewpagergridview.R;
 
+/**
+ * Demo Activity for GridViewPager
+ * 
+ * @author Ken Huang
+ *
+ */
 public class MainActivity extends Activity {
 
-    private WrapContentViewPager viewPager;
+    private WrapContentViewPager mWrapContentViewPager;
+
+    // you can change your data type
     private GridViewPagerAdapter<String> mBaseGridViewPagerAdapter;
     private List<String> mDatas = new ArrayList<String>();
-    private static final String TAG = "MainActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Log.d("activity", "onCreate");
 
+        // prepare data for demo
         for (int i = 0; i < 24; i++) {
             mDatas.add(String.valueOf(i));
         }
@@ -43,12 +51,21 @@ public class MainActivity extends Activity {
             }
         };
 
-        viewPager = (WrapContentViewPager) findViewById(R.id.myviewpager);
-        viewPager.setAdapter(mBaseGridViewPagerAdapter);
-        viewPager.setOffscreenPageLimit(mBaseGridViewPagerAdapter.getCount());
-        viewPager.setOnPageChangeListener(new MyOnPageChangeListener());
-        mBaseGridViewPagerAdapter.setOnSizeChangeListener(viewPager);
+        mWrapContentViewPager = (WrapContentViewPager) findViewById(R.id.myviewpager);
+        mWrapContentViewPager.setAdapter(mBaseGridViewPagerAdapter);
+        mWrapContentViewPager.setOffscreenPageLimit(mBaseGridViewPagerAdapter.getCount());
 
+        mBaseGridViewPagerAdapter.setOnSizeChangeListener(mWrapContentViewPager);
+        mBaseGridViewPagerAdapter.setOnGridItemClickListener(new OnGridItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id,
+                    Object o) {
+                Toast.makeText(MainActivity.this, o.toString(), Toast.LENGTH_LONG).show();
+            }
+        });
+
+        // dynamic change gridView size
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             mBaseGridViewPagerAdapter.setHorizontalAndVerticalNum(6, 1);
         } else {
@@ -56,22 +73,12 @@ public class MainActivity extends Activity {
         }
     }
 
-    public class MyOnPageChangeListener implements OnPageChangeListener {
-        @Override
-        public void onPageSelected(int position) {
-            Log.d(TAG, "onPageSelected : " + position);
-        }
-
-        @Override
-        public void onPageScrolled(int position, float positionOffset, int
-                positionOffsetPixels) {
-        }
-
-        @Override
-        public void onPageScrollStateChanged(int arg0) {
-        }
-    }
-
+    /**
+     * your custom BaseAdapter
+     * 
+     * @author Ken Huang
+     *
+     */
     static class ViewHolder {
         private TextView nameTextView;
         private ImageView personImageView;

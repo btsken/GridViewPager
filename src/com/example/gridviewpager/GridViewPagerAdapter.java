@@ -20,14 +20,14 @@ public abstract class GridViewPagerAdapter<T> extends PagerAdapter {
     private OnGridItemClickListener mOnGridItemClickListener;
     private OnSizeChangeListener mOnSizeChangeListener;
 
-    private int horizontalNum = 3; // initial value
-    private int verticalNum = 2; // initial value
-    private int pageItemNum = 6; // initial value
+    private int horizontalNum = 3; // default value
+    private int verticalNum = 2; // default value
+    private int pageItemNum = 6; // default value
 
     public interface OnGridItemClickListener {
-        void onItemClick(AdapterView<?> parent, View view, int position, long id);
+        void onItemClick(AdapterView<?> parent, View view, int position, long id, Object o);
     }
-    
+
     public interface OnSizeChangeListener {
         void onSizeChange(int verticalNum);
     }
@@ -42,7 +42,7 @@ public abstract class GridViewPagerAdapter<T> extends PagerAdapter {
     }
 
     public abstract BaseAdapter getBaseAdapter(int currentPageNum);
-    
+
     public void setOnSizeChangeListener(OnSizeChangeListener l) {
         mOnSizeChangeListener = l;
     }
@@ -51,13 +51,15 @@ public abstract class GridViewPagerAdapter<T> extends PagerAdapter {
     public Object instantiateItem(ViewGroup container, int currentPageNum) {
         GridView gv = new GridView(mContext);
         gv.setNumColumns(horizontalNum);
-        gv.setAdapter(getBaseAdapter(currentPageNum));
+        final BaseAdapter adapter = getBaseAdapter(currentPageNum);
+        gv.setAdapter(adapter);
         gv.setOnItemClickListener(new OnItemClickListener() {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if (mOnGridItemClickListener != null) {
-                    mOnGridItemClickListener.onItemClick(parent, view, position, id);
+                    mOnGridItemClickListener.onItemClick(parent, view, position, id,
+                            adapter.getItem(position));
                 }
             }
         });
@@ -123,7 +125,7 @@ public abstract class GridViewPagerAdapter<T> extends PagerAdapter {
     public int getHorizontalNum() {
         return horizontalNum;
     }
-    
+
     public void setHorizontal(int horizontalNum) {
         this.horizontalNum = horizontalNum;
         updatePageItemNumber();

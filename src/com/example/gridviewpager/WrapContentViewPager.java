@@ -1,11 +1,16 @@
 package com.example.gridviewpager;
 
+import com.example.gridviewpager.GridViewPagerAdapter.OnSizeChangeListener;
+
 import android.content.Context;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.view.View;
 
-public class WrapContentViewPager extends ViewPager {
+public class WrapContentViewPager extends ViewPager implements OnSizeChangeListener {
+
+    private int verticalNum = 2; // initial value
+    private int widthMeasureSpec, heightMeasureSpec;
 
     public WrapContentViewPager(Context context) {
         super(context);
@@ -28,10 +33,18 @@ public class WrapContentViewPager extends ViewPager {
 
             int h = child.getMeasuredHeight();
             if (h > height) {
-                height = h;
+                height = h * verticalNum;
             }
         }
         heightMeasureSpec = MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY);
+        this.widthMeasureSpec = widthMeasureSpec;
+        this.heightMeasureSpec = heightMeasureSpec;
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+    }
+
+    @Override
+    public void onSizeChange(int verticalNum) {
+        this.verticalNum = verticalNum;
+        this.measure(widthMeasureSpec, heightMeasureSpec);
     }
 }

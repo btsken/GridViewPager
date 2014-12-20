@@ -10,21 +10,26 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.GridView;
 
-public class GridViewPagerAdapter<T> extends PagerAdapter {
+public abstract class GridViewPagerAdapter<T> extends PagerAdapter {
 
     private Context mContext;
     private List<T> mDatas;
     private OnGridItemClickListener mOnGridItemClickListener;
+    private OnSizeChangeListener mOnSizeChangeListener;
 
-    private int horizontalNum = 3;
-    private int verticalNum = 2;
-    private int pageItemNumber = 6;
+    private int horizontalNum = 3; // initial value
+    private int verticalNum = 2; // initial value
+    private int pageItemNum = 6; // initial value
 
     public interface OnGridItemClickListener {
         void onItemClick(AdapterView<?> parent, View view, int position, long id);
+    }
+    
+    public interface OnSizeChangeListener {
+        void onSizeChange(int verticalNum);
     }
 
     public void setOnGridItemClickListener(OnGridItemClickListener l) {
@@ -36,17 +41,22 @@ public class GridViewPagerAdapter<T> extends PagerAdapter {
         mDatas = datas;
     }
 
+    public abstract BaseAdapter getBaseAdapter(int currentPageNum);
+    
+    public void setOnSizeChangeListener(OnSizeChangeListener l) {
+        mOnSizeChangeListener = l;
+    }
+
     @Override
-    public Object instantiateItem(ViewGroup container, int position) {
+    public Object instantiateItem(ViewGroup container, int currentPageNum) {
         GridView gv = new GridView(mContext);
         gv.setNumColumns(horizontalNum);
-        gv.setAdapter(new ArrayAdapter<T>(mContext,
-                android.R.layout.simple_expandable_list_item_1, getSix(position)));
+        gv.setAdapter(getBaseAdapter(currentPageNum));
         gv.setOnItemClickListener(new OnItemClickListener() {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if(mOnGridItemClickListener != null) {
+                if (mOnGridItemClickListener != null) {
                     mOnGridItemClickListener.onItemClick(parent, view, position, id);
                 }
             }
@@ -55,26 +65,22 @@ public class GridViewPagerAdapter<T> extends PagerAdapter {
         return gv;
     }
 
-    public int getPageNumber() {
-        return (int) Math.ceil(getCount() / pageItemNumber);
-    }
-
-    private List<T> getSix(int position) {
-        int size = getCount();
+    public List<T> getComputedList(int currentPageNum) {
+        int totalNum = getDataSize();
         List<T> result = new ArrayList<T>();
 
-        if (size >= (position + 1) * pageItemNumber) {
-
-            for (int i = position * pageItemNumber; i < (position * pageItemNumber)
-                    + pageItemNumber; i++) {
+        if (totalNum >= (currentPageNum + 1) * pageItemNum) {
+            // totalNum bigger than pageItemNum
+            for (int i = currentPageNum * pageItemNum; i < (currentPageNum * pageItemNum)
+                    + pageItemNum; i++) {
                 result.add(mDatas.get(i));
             }
         } else {
 
-            for (int i = position * pageItemNumber; i < (position * pageItemNumber)
-                    + pageItemNumber; i++) {
+            for (int i = currentPageNum * pageItemNum; i < (currentPageNum * pageItemNum)
+                    + pageItemNum; i++) {
 
-                if (i < (size % pageItemNumber) + (position * pageItemNumber)) {
+                if (i < (totalNum % pageItemNum) + (currentPageNum * pageItemNum)) {
                     result.add(mDatas.get(i));
                 }
             }
@@ -82,9 +88,20 @@ public class GridViewPagerAdapter<T> extends PagerAdapter {
         return result;
     }
 
+    /**
+     * 
+     * @return total data size
+     */
+    private int getDataSize() {
+        return mDatas.size();
+    }
+
+    /**
+     * ViewPager total page size
+     */
     @Override
     public int getCount() {
-        return mDatas.size();
+        return (int) Math.ceil(getDataSize() / (double) pageItemNum);
     }
 
     @Override
@@ -92,16 +109,29 @@ public class GridViewPagerAdapter<T> extends PagerAdapter {
         return (view == object);
     }
 
+    @Override
+    public void destroyItem(View container, int position, Object object) {
+        ((ViewGroup) container).removeView((View) object);
+        object = null;
+    }
+
     private void updatePageItemNumber() {
-        pageItemNumber = horizontalNum * verticalNum;
+        pageItemNum = horizontalNum * verticalNum;
+        mOnSizeChangeListener.onSizeChange(verticalNum);
     }
 
     public int getHorizontalNum() {
         return horizontalNum;
     }
-
-    public void setHorizontalNum(int horizontalNum) {
+    
+    public void setHorizontal(int horizontalNum) {
         this.horizontalNum = horizontalNum;
+        updatePageItemNumber();
+    }
+
+    public void setHorizontalAndVerticalNum(int horizontalNum, int verticalNum) {
+        this.horizontalNum = horizontalNum;
+        this.verticalNum = verticalNum;
         updatePageItemNumber();
     }
 
@@ -113,5 +143,4 @@ public class GridViewPagerAdapter<T> extends PagerAdapter {
         this.verticalNum = verticalNum;
         updatePageItemNumber();
     }
-
 }

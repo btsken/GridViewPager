@@ -26,6 +26,5 @@ For more demo, seeing MainActivity.java
 Screenshots
 ------------
 
-![port](https://raw.github.com/btsken/GridViewPager/master/screenshot1.png)
-![land](https://raw.github.com/btsken/GridViewPager/master/screenshot2.png)
+![port](https://raw.github.com/btsken/GridViewPager/master/animation.gif)
 
